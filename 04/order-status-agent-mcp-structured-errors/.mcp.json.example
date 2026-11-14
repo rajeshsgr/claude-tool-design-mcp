@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "order-tools": {
+      "type": "stdio",
+      "command": "/ABSOLUTE/PATH/TO/order-status-agent-mcp-two-tools/.venv/bin/python",
+      "args": ["/ABSOLUTE/PATH/TO/order-status-agent-mcp-two-tools/mcp_server.py"]
+    }
+  }
+}

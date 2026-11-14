@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Claude Order Status Agent | Direct Tool vs MCP</title>
+<style>
+:root{--bg:#08101d;--panel:#101d30;--panel2:#14243a;--line:#2e425e;--txt:#eaf2ff;--muted:#9db0ca;--cyan:#52d9e9;--violet:#bc9af8;--green:#69dfb1;--amber:#ffcc83;--red:#ff8293;--shadow:0 18px 45px #0005}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 80% 3%,#1c2a50 0,transparent 33%),var(--bg);color:var(--txt);line-height:1.5}
+main{max-width:1440px;margin:auto;padding:35px 30px 75px}
+header{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:25px;flex-wrap:wrap}.eyebrow{font-weight:700;letter-spacing:.16em;font-size:12px;color:var(--cyan);text-transform:uppercase}h1{font-size:clamp(28px,3.5vw,46px);line-height:1.15;margin:9px 0 13px;letter-spacing:-.03em}h2{font-size:23px;margin:0 0 4px;letter-spacing:-.02em}h3{margin:0;font-size:15px}p{margin:0;color:var(--muted)}.intro{max-width:800px;font-size:15px}.pill{border:1px solid #375475;border-radius:24px;padding:7px 11px;font-size:12px;color:#c9dbf4;background:#192943}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.tabs{display:flex;background:#111d30;padding:5px;border:1px solid #2a4059;border-radius:12px;gap:5px;flex-wrap:wrap}button{font:inherit;cursor:pointer}button.tab{border:0;background:transparent;color:#aac1db;border-radius:8px;padding:10px 17px;font-weight:650;font-size:13px}button.tab.active{background:#2b4866;color:white;box-shadow:0 3px 12px #0003}.button{border:1px solid #406381;background:#192e4b;color:white;border-radius:9px;padding:9px 14px;font-weight:650;font-size:13px}.button:hover,.tab:hover{filter:brightness(1.2)}button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.banner{padding:14px 18px;border:1px solid #32516d;border-radius:13px;background:#13253b;margin-bottom:22px;font-size:14px;color:#cbdaf0}.banner strong{color:white}
+.duo{display:grid;grid-template-columns:1fr;gap:22px;max-width:900px;margin:0 auto}.diagram{background:linear-gradient(160deg,#142239,#0f192a);border:1px solid #2f4663;border-radius:18px;padding:22px;box-shadow:var(--shadow);min-width:0}.diagram-head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:18px}.diagram-head p{font-size:13px;margin-top:5px}.mode{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:750;border-radius:7px;padding:6px 8px;white-space:nowrap}.direct .mode{background:#133e47;color:#7deafa}.mcp .mode{background:#383055;color:#d2b9ff}
+.flow{display:flex;flex-direction:column;align-items:center}.node{position:relative;width:100%;max-width:470px;border:1px solid #425a77;background:#1a2d45;border-radius:12px;padding:11px 15px;text-align:center;min-height:65px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;transition:transform .25s,border-color .25s,box-shadow .25s,opacity .2s}.node b{font-size:14px}.node small{font-size:11.5px;color:#adc1dd}.node.user{border-color:#5a7495}.node.claude{background:#222d4a;border-color:#9584c9}.node.tool{background:#143844;border-color:#4699a3}.node.mcpnode{background:#302b48;border-color:#8070bd}.node.api{background:#253846;border-color:#77aa95}.node.result{background:#153c35;border-color:#56ae8a}.node.note{background:#2e3144;border-color:#7d779b}.node strong{color:var(--cyan)}.node .mini{font-size:10px;font-weight:700;letter-spacing:.08em;color:#d5b6ff;text-transform:uppercase}.node.active{border-color:var(--amber);box-shadow:0 0 0 2px #ffcc8350,0 0 22px #ffcc8330;transform:scale(1.018)}.node.dim{opacity:.36}.node:hover{border-color:#91cfe8}.arrow{height:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7e9cbf;font-size:20px;line-height:1}.arrow:before{content:"";width:2px;height:12px;background:#597b9c}.arrow:after{content:"▼";font-size:12px;margin-top:-1px}.boundary{border:1px dashed #60749c;border-radius:14px;padding:12px 13px 15px;width:100%;margin:3px 0}.boundary.mcp-boundary{border-color:#9584c9}.boundary-label{font-size:10px;font-weight:750;color:#acc1df;text-transform:uppercase;letter-spacing:.11em;margin-bottom:10px;text-align:center}.boundary .node{max-width:none}.route{width:100%;text-align:center;padding:9px 0;margin:2px 0;font-size:11px;font-weight:650;border:1px dashed #45607e;border-radius:9px;color:#bccee2;background:#13243a}.route span{color:var(--green)}.hint{font-size:11px;color:#a6bdd6;text-align:center;margin-top:11px}
+.detail{margin-top:20px;background:#111f33;border:1px solid #304864;border-radius:15px;padding:22px}.detail-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.step{background:#1a2a42;border:1px solid #344d68;border-radius:11px;padding:14px}.step .number{font-size:11px;font-weight:800;color:var(--cyan);margin-bottom:6px}.step strong{display:block;font-size:13px;margin-bottom:5px}.step p{font-size:12px}.code{display:block;background:#081421;padding:7px 9px;border-radius:7px;color:#93e6d2;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:normal;overflow-wrap:anywhere;font-size:11px;margin-top:9px}.comparison{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:21px 0}.comparison .fact{background:#112138;border:1px solid #314a67;border-radius:11px;padding:14px}.fact .label{display:block;color:#8ea8c5;text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:800;margin-bottom:7px}.fact strong{font-size:13px}.switchtext{color:#a4bdd9;font-size:12px;margin-top:6px}.footer{margin-top:22px;color:#8da8c6;font-size:12px}.hidden{display:none!important}
+@media(max-width:970px){.duo{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,1fr)}.comparison{grid-template-columns:repeat(2,1fr)}}@media(max-width:550px){main{padding:24px 14px 60px}.diagram{padding:15px}.steps,.comparison{grid-template-columns:1fr}.controls{align-items:stretch}.tabs{width:100%}button.tab{flex:1;padding:9px 8px;font-size:12px}.node b{font-size:12px}}
+@media print{body{background:white;color:#111}main{max-width:none;padding:12px}.diagram,.detail,.comparison .fact{background:#fff;box-shadow:none;border:1px solid #aaa}.node,.step{background:#fafafa!important;border:1px solid #777!important;color:#111}.node b,.node small,.step p,p,.hint,.route{color:#333}header .pill,.controls,.banner,.footer{display:none}.duo{grid-template-columns:1fr 1fr}.node{min-height:48px}.arrow{height:16px}.boundary{padding:5px}.detail{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main>
+<header><div><div class="eyebrow">Claude · Agent Tool Design · MCP Integration</div><h1>Order Status Agent: Four Examples</h1><p class="intro">Four progressive demos: direct Python tool calling, MCP integration, multi-tool selection, and structured MCP execution errors.</p></div></header>
+<div class="controls"><div class="tabs" role="tablist" aria-label="Flowchart views"><button class="tab active" data-view="direct" role="tab" aria-selected="true">Example 1 · Direct Tool Calling</button><button class="tab" data-view="mcp" role="tab" aria-selected="false">Example 2 · One MCP Tool</button><button class="tab" data-view="two" role="tab" aria-selected="false">Example 3 · Two MCP Tools</button><button class="tab" data-view="errors" role="tab" aria-selected="false">Example 4 · Structured Errors</button></div></div>
+<div class="banner" id="banner"><strong>Example 1:</strong> Claude selects a tool; <code>app.py</code> calls a local Python function. <strong style="margin-left:12px">Example 2:</strong> Claude selects a tool; the MCP client calls the MCP server through the protocol. In both examples, the mock API runs in <code>order_api.py</code>.</div>
+<section class="duo" id="duo">
+<article class="diagram direct" data-diagram="direct"><div class="diagram-head"><div><h2>Example 1 · Direct Tool Calling</h2><p>Claude API + Python function registry</p></div><span class="mode">DIRECT PYTHON</span></div><div class="flow">
+<div class="node user" data-step><b>👤 User / Web UI</b><small>“Check order ORD-1234”</small></div><div class="arrow"></div>
+<div class="node" data-step><b>app.py · FastAPI chat endpoint</b><small>Builds messages and agent loop</small></div><div class="arrow"></div>
+<div class="node claude" data-step><b>🧠 Claude API — LLM call #1</b><small>System prompt + <code>tools=[ORDER_TOOL]</code> + auto</small></div><div class="arrow"></div>
+<div class="node tool" data-step><b>Claude returns a tool_use request</b><small><code>get_order_status(order_id="ORD-1234")</code></small></div><div class="arrow"></div>
+<div class="boundary"><div class="boundary-label">Local Python process — no MCP</div><div class="node tool" data-step><b>app.py validates & invokes tool</b><small><code>TOOL_REGISTRY[name](order_id)</code></small></div><div class="arrow"></div><div class="node api" data-step><b>order_api.py · Mock API</b><small>Random status: Processing / Shipped / Delayed / …</small></div></div><div class="arrow"></div>
+<div class="node result" data-step><b>app.py appends tool_result</b><small>Tool result added to conversation history</small></div><div class="arrow"></div>
+<div class="node claude" data-step><b>🧠 Claude API — LLM call #2</b><small>Reads tool result; writes user-friendly answer</small></div><div class="arrow"></div>
+<div class="node result" data-step><b>✅ Answer in Web UI</b><small>“Your order ORD-1234 is shipped.”</small></div></div><p class="hint">Tool contract: <code>tools.py</code> · Executes: Python function</p></article>
+<article class="diagram mcp" data-diagram="mcp"><div class="diagram-head"><div><h2>Example 2 · MCP Tool Calling</h2><p>Claude API + MCP client/server over stdio</p></div><span class="mode">MCP PROTOCOL</span></div><div class="flow">
+<div class="node user" data-step><b>👤 User / Web UI</b><small>“Check order ORD-1234”</small></div><div class="arrow"></div>
+<div class="node" data-step><b>app.py · FastAPI + MCP client</b><small>Launches MCP server process / initializes session</small></div><div class="arrow"></div>
+<div class="node mcpnode" data-step><b>MCP discovery · tools/list</b><small>Fetches tool name, description & input schema</small></div><div class="arrow"></div>
+<div class="node claude" data-step><b>🧠 Claude API — LLM call #1</b><small>Discovered tools + <code>tool_choice=auto</code></small></div><div class="arrow"></div>
+<div class="node tool" data-step><b>Claude returns a tool_use request</b><small><code>get_order_status(order_id="ORD-1234")</code></small></div><div class="arrow"></div>
+<div class="boundary mcp-boundary"><div class="boundary-label">MCP boundary — stdio / tools/call</div><div class="node mcpnode" data-step><b>app.py · MCP client calls server</b><small><code>session.call_tool(name, arguments)</code></small></div><div class="arrow"></div><div class="node mcpnode" data-step><b>mcp_server.py · MCP tool</b><small>Receives call, validates & dispatches</small></div><div class="arrow"></div><div class="node api" data-step><b>order_api.py · Same Mock API</b><small>Random status: Processing / Shipped / Delayed / …</small></div></div><div class="arrow"></div>
+<div class="node result" data-step><b>MCP result → Claude tool_result</b><small>Client converts result into Claude conversation</small></div><div class="arrow"></div>
+<div class="node claude" data-step><b>🧠 Claude API — LLM call #2</b><small>Reads tool result; writes user-friendly answer</small></div><div class="arrow"></div>
+<div class="node result" data-step><b>✅ Answer in Web UI</b><small>“Your order ORD-1234 is shipped.”</small></div></div><p class="hint">Tool contract: MCP server · Executes: MCP <code>tools/call</code></p></article>
+<article class="diagram mcp" data-diagram="two"><div class="diagram-head"><div><h2>Example 3 · Two MCP Tools</h2><p>Claude selects status, ETA, or both based on distinct tool descriptions</p></div><span class="mode">MULTI-TOOL MCP</span></div><div class="flow">
+<div class="node user"><b>👤 User / Web UI</b><small>“What's the status and ETA of ORD-1234?”</small></div><div class="arrow"></div>
+<div class="node"><b>app.py · FastAPI + MCP client</b><small>Starts MCP server and initializes session</small></div><div class="arrow"></div>
+<div class="node mcpnode"><b>MCP discovery · tools/list</b><small>Discovers two tool descriptions and input schemas</small></div><div class="arrow"></div>
+<div class="node claude"><b>🧠 Claude API — LLM call #1</b><small>Both tools + <code>tool_choice=auto</code></small></div><div class="arrow"></div>
+<div class="node tool"><b>Claude selects relevant tool(s)</b><small>Status question → <code>get_order_status</code><br>ETA question → <code>get_delivery_eta</code><br>Combined → may select both</small></div><div class="arrow"></div>
+<div class="boundary mcp-boundary"><div class="boundary-label">MCP boundary — tools/call (one or multiple requests)</div>
+<div class="node mcpnode"><b>app.py · MCP client</b><small><code>session.call_tool(name, arguments)</code> for each selected tool</small></div><div class="arrow"></div>
+<div class="node mcpnode"><b>mcp_server.py · 2 registered MCP tools</b><small>Validates order ID and routes each tool call</small></div><div class="arrow"></div>
+<div class="node tool"><b>Tool A · get_order_status</b><small><code>order_api.py</code> → random status</small></div><div class="route">OR / AND — based on what Claude requests</div>
+<div class="node tool"><b>Tool B · get_delivery_eta</b><small><code>delivery_api.py</code> → mock ETA</small></div></div><div class="arrow"></div>
+<div class="node result"><b>MCP tool results → Claude tool_result</b><small>One matching result per tool_use ID</small></div><div class="arrow"></div>
+<div class="node claude"><b>🧠 Claude API — LLM call #2</b><small>Interprets tool results; may request more tools if needed</small></div><div class="arrow"></div>
+<div class="node result"><b>✅ Answer in Web UI</b><small>“Order ORD-1234 shipped; mock arrival date is …”</small></div></div><p class="hint">Tool selection: descriptions + user intent · Execution: MCP <code>tools/call</code> · Two separate mock APIs</p></article>
+<article class="diagram mcp" data-diagram="errors"><div class="diagram-head"><div><h2>Example 4 · Structured MCP Errors</h2><p>Two tools + error category, retryability, recovery guidance</p></div><span class="mode">isError / structuredContent</span></div><div class="flow">
+<div class="node user"><b>👤 User / Web UI</b><small>“Check ORD-1001” (simulate temporary failure)</small></div><div class="arrow"></div>
+<div class="node"><b>app.py · MCP Client</b><small>Discovers 2 tools through tools/list</small></div><div class="arrow"></div>
+<div class="node claude"><b>🧠 Claude API — LLM call #1</b><small>Selects <code>get_order_status</code> with <code>tool_choice=auto</code></small></div><div class="arrow"></div>
+<div class="boundary mcp-boundary"><div class="boundary-label">MCP tools/call → mcp_server.py → mock API</div>
+<div class="node tool"><b>Tool executes — simulated failure</b><small>First request for ORD-1001 is temporarily unavailable</small></div><div class="arrow"></div>
+<div class="node" style="border-color:#ea8585;background:#3a2230"><b>⚠️ MCP execution error</b><small><code>isError: true</code> + <code>structuredContent</code></small><small><code>errorCategory: transient</code> · <code>isRetryable: true</code></small><small>description + recoveryAction included</small></div></div><div class="arrow"></div>
+<div class="node claude"><b>🧠 Claude API — LLM call #2</b><small>Reads structured error; may request one retry</small></div><div class="arrow"></div>
+<div class="node tool"><b>Retry through MCP (if Claude chooses)</b><small>Same order ID → mock server succeeds on second attempt</small></div><div class="arrow"></div>
+<div class="node claude"><b>🧠 Claude API — LLM call #3</b><small>Reads successful tool_result and writes response</small></div><div class="arrow"></div>
+<div class="node result"><b>✅ Answer in Web UI</b><small>Displays result, or explains failure if no retry chosen</small></div>
+</div><p class="hint">Other test IDs: <code>ORD-ABCD</code> validation · <code>ORD-1003</code> business · <code>ORD-1004</code> permission · <code>ORD-9999</code> valid empty result. Protocol errors are separate JSON-RPC errors, not <code>isError:true</code> tool results.</p></article>
+</section>
+<p class="footer">Note: With tool_choice=auto, Claude may answer without a tool (e.g., “Hello” or missing order ID). The diagrams illustrate typical successful tool calls; selections can vary. The second Claude call happens in the agent loop after the tool result is added to messages.</p>
+</main>
+<script>
+const tabs = [...document.querySelectorAll('.tab')];
+const diagrams = [...document.querySelectorAll('[data-diagram]')];
+const banner = document.querySelector('#banner');
+const descriptions = {
+  direct: '<strong>Example 1 — Direct Python:</strong> Claude selects the tool using <code>tool_choice=auto</code>. <code>app.py</code> validates and executes it through <code>TOOL_REGISTRY</code>, then returns the result to Claude.',
+  mcp: '<strong>Example 2 — MCP:</strong> The Python MCP client discovers one tool using <code>tools/list</code> and executes it using <code>tools/call</code>.',
+  two: '<strong>Example 3 — Two tools:</strong> MCP exposes <code>get_order_status</code> and <code>get_delivery_eta</code>. Claude chooses one or both based on the request; each calls its own mock API.',
+  errors: '<strong>Example 4 — Structured execution errors:</strong> The MCP server returns <code>isError:true</code> and a structured <code>errorCategory</code>, <code>isRetryable</code> and <code>recoveryAction</code>. Claude can choose to retry transient failures, correct invalid inputs, or escalate non-retryable cases.'
+};
+function show(view) {
+  tabs.forEach(tab => {
+    const selected = tab.dataset.view === view;
+    tab.classList.toggle('active', selected);
+    tab.setAttribute('aria-selected', String(selected));
+  });
+  diagrams.forEach(diagram => diagram.classList.toggle('hidden', diagram.dataset.diagram !== view));
+  banner.innerHTML = descriptions[view];
+}
+tabs.forEach(tab => tab.addEventListener('click', () => show(tab.dataset.view)));
+show('direct');
+</script>
+</body></html>

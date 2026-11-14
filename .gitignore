@@ -1,0 +1,23 @@
+# Secrets and local configuration
+.env
+.env.*
+.claude.json
+.mcp.json
+*.pem
+*.key
+
+# Python virtual environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local editor and macOS files
+.DS_Store
+.idea/
+.vscode/
+*.log
